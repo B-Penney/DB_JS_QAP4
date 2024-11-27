@@ -40,22 +40,49 @@ const USERS = [
 ];
 
 // GET /login - Render login form
-app.get("/login", (request, response) => {
+app.get("/login", (_request, response) => {
     response.render("login");
 });
 
 // POST /login - Allows a user to login
 app.post("/login", (request, response) => {
+    const { email, password } = request.body;
+    if (!email || !password) {
+        return response.status(400).send("Please fill the required fields");
+    }
+
+    const user = USERS.find((user) => user.email === email);
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+        return response.status(401).send("Invalid credentials");
+    }
+
+    request.session.user = user;
+    response.redirect("/landing");
 
 });
 
 // GET /signup - Render signup form
-app.get("/signup", (request, response) => {
+app.get("/signup", (_request, response) => {
     response.render("signup");
 });
 
 // POST /signup - Allows a user to signup
 app.post("/signup", (request, response) => {
+    const { username, email, password } = request.body;
+    if (!username || !email || !password) {
+        return response.status(400).send("Please fill in all required fields");
+    }
+
+    const existingUser = USERS.find((user) => user.email === email);
+    if (existingUser) {
+        return response.status(400).send("User already exists");
+    }
+
+    const id = USERS.length + 1;
+    const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS);
+    const newUser = { id, username, email, password: hashedPassword, role: "user" };
+    USERS.push(newUser);
+    response.redirect("/login");
     
 });
 
@@ -69,8 +96,23 @@ app.get("/", (request, response) => {
 
 // GET /landing - Shows a welcome page for users, shows the names of all users if an admin
 app.get("/landing", (request, response) => {
-    
+    const user = request.session.user;
+    if (!user) {
+        return response.redirect("/login");
+    }
+
+    if (user.role === "admin") {
+        return response.render("landing", { user, USERS });
+    }
+
+    response.render("landing", { user, USERS: null });
 });
+
+// POST /logout - Logs out the user
+app.post('/logout', (request, response) => {
+    request.session.destroy();
+    response.redirect('/login');
+  });
 
 // Start server
 app.listen(PORT, () => {

@@ -1,4 +1,4 @@
-<%- include('partials/header', { title: "Home" }) %>
+<%- include('partials/header', { title: "Landing" }) %>
 
 <% layout('layouts/layout') %>
 <h2>Welcome, <%= user.username %>!</h2>
@@ -15,6 +15,6 @@
 <form action="/logout" method="POST">
   <button type="submit">Logout</button>
 </form>
-<p><a href="/">Go back</a></p>
+<a href="/logout">Logout</a>
 
 <%- include('partials/footer') %>
