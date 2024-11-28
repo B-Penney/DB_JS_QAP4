@@ -1,20 +1,18 @@
 <%- include('partials/header', { title: "Landing" }) %>
 
-<% layout('layouts/layout') %>
-<h2>Welcome, <%= user.username %>!</h2>
-<% if (user.role === 'admin') { %>
-  <h3>All Users:</h3>
-  <ul>
-    <% users.forEach(u => { %>
-      <li><%= u.username %> - <%= u.email %> (<%= u.role %>)</li>
-    <% }) %>
-  </ul>
+<h1>Welcome, <%= user.username %></h1>
+<% if (USERS) { %>
+    <h2>All Users (Admin Access)</h2>
+    <ul>
+        <% USERS.forEach(user => { %>
+            <li><%= user.name %> <%= user.email %>- Role: <%= user.role %></li>
+        <% }) %>
+    </ul>
 <% } else { %>
-  <p>Your Dashboard.</p>
+    <p>You do not have access to view all users.</p>
 <% } %>
-<form action="/logout" method="POST">
-  <button type="submit">Logout</button>
+<form action="/logout" method="post">
+    <button type="submit">Logout</button>
 </form>
-<a href="/logout">Logout</a>
 
 <%- include('partials/footer') %>
