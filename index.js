@@ -39,6 +39,13 @@ const USERS = [
     },
 ];
 
+function getAllUsers() {
+    return [
+        { name: "User1", email: "admin@example.com", role: "admin" },
+        { name: "User2", email:"user@example.com", role: "user" },
+    ];
+}
+
 // GET /login - Render login form
 app.get("/login", (_request, response) => {
     response.render("login");
@@ -101,11 +108,10 @@ app.get("/landing", (request, response) => {
         return response.redirect("/login");
     }
 
-    if (user.role === "admin") {
-        return response.render("landing", { user, USERS });
-    }
+    const USERS = (user && user.role === "admin") ? getAllUsers() : null; 
 
-    response.render("landing", { user, USERS: null });
+    // Render the landing page with user and USERS
+    response.render("landing", { user, USERS });
 });
 
 // POST /logout - Logs out the user
